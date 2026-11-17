@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>R&J Tour and Services — Payment Monitoring</title>
+<style>
+  /* ============ THEME: royal blue / cream white / gold ============ */
+  :root {
+    --royal-blue: #1a2f6e;
+    --royal-blue-dark: #12224f;
+    --royal-blue-light: #2a4a9e;
+    --cream: #fdf8ec;
+    --cream-dark: #f5ecd6;
+    --gold: #c9a227;
+    --gold-light: #e6c85a;
+    --gold-dark: #a8861a;
+    --text-dark: #1b1b1b;
+    --text-muted: #6b6b6b;
+    --danger: #b3261e;
+    --danger-light: #fde8e7;
+    --success: #1e7a3c;
+    --border: #d9cfae;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--cream);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ============ HEADER ============ */
+  header {
+    background: linear-gradient(135deg, var(--royal-blue) 0%, var(--royal-blue-dark) 100%);
+    color: var(--cream);
+    text-align: center;
+    padding: 22px 16px 18px;
+    border-bottom: 4px solid var(--gold);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  header h1 {
+    font-size: 1.9rem;
+    letter-spacing: 1px;
+    color: var(--gold-light);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+  }
+  header .subtitle {
+    font-size: 1.15rem;
+    margin-top: 4px;
+    color: var(--cream);
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  header .tagline {
+    margin-top: 8px;
+    font-size: 0.92rem;
+    font-style: italic;
+    color: var(--cream-dark);
+    opacity: 0.95;
+  }
+
+  /* ============ MAIN ============ */
+  main {
+    flex: 1;
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 22px 16px 40px;
+  }
+
+  .card {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin-bottom: 22px;
+    box-shadow: 0 2px 6px rgba(26,47,110,0.07);
+  }
+
+  .card h2 {
+    font-size: 1.05rem;
+    color: var(--royal-blue);
+    border-left: 4px solid var(--gold);
+    padding-left: 10px;
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+  }
+
+  /* ============ INPUT CONTAINER ============ */
+  .input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 14px;
+    align-items: end;
+  }
+
+  .field { display: flex; flex-direction: column; }
+  .field label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--royal-blue);
+    margin-bottom: 5px;
+    letter-spacing: 0.3px;
+  }
+  .field label .optional {
+    font-weight: 400;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+  .field input {
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background: var(--cream);
+    color: var(--text-dark);
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,162,39,0.18);
+    background: #fff;
+  }
+
+  .error-msg {
+    color: var(--danger);
+    font-size: 0.8rem;
+    margin-top: 6px;
+    min-height: 16px;
+    font-weight: 600;
+  }
+
+  .add-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+
+  /* ============ BUTTONS ============ */
+  button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    transition: transform 0.08s, box-shadow 0.15s, background 0.15s;
+  }
+  button:active { transform: scale(0.98); }
+
+  .btn-add {
+    background: var(--gold);
+    color: var(--royal-blue-dark);
+    padding: 10px 26px;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 6px rgba(201,162,39,0.35);
+  }
+  .btn-add:hover:not(:disabled) { background: var(--gold-light); }
+  .btn-add:disabled {
+    background: #d8d2c2;
+    color: #9c968a;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .btn-reset {
+    background: var(--danger);
+    color: #fff;
+    padding: 9px 20px;
+    font-size: 0.88rem;
+    box-shadow: 0 2px 6px rgba(179,38,30,0.3);
+  }
+  .btn-reset:hover { background: #9a1f19; }
+
+  .btn-delete {
+    background: var(--danger-light);
+    color: var(--danger);
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    border: 1px solid var(--danger);
+  }
+  .btn-delete:hover { background: var(--danger); color: #fff; }
+
+  /* ============ TABLE ============ */
+  .table-wrap {
+    overflow-x: auto;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 980px;
+  }
+  thead th {
+    background: var(--royal-blue);
+    color: var(--cream);
+    text-align: left;
+    padding: 11px 10px;
+    font-weight: 600;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+    border-bottom: 3px solid var(--gold);
+  }
+  tbody td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--cream-dark);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+  tbody tr:nth-child(even) { background: #fcfaf3; }
+  tbody tr:hover { background: var(--cream-dark); }
+  tbody tr.highlight {
+    background: #fff4c2 !important;
+    box-shadow: inset 3px 0 0 var(--gold);
+  }
+  tbody tr.checked-row { background: #e8f5ec; }
+
+  .currency { text-align: right; font-variant-numeric: tabular-nums; }
+  .empty-row td {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 26px 10px;
+  }
+
+  input.payment-input {
+    width: 110px;
+    padding: 6px 9px;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    text-align: right;
+    background: #fff;
+  }
+  input.payment-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 2px rgba(201,162,39,0.2);
+  }
+  input.payment-input:disabled {
+    background: #f0ece0;
+    color: var(--text-muted);
+    cursor: not-allowed;
+  }
+
+  .change-cell { color: var(--success); font-weight: 600; }
+  .change-cell.inactive { color: var(--text-muted); font-weight: 400; }
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--royal-blue);
+    cursor: pointer;
+  }
+  input[type="checkbox"]:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+  }
+
+  /* ============ TOTAL COLLECTED ============ */
+  .total-bar {
+    display: none;
+    justify-content: flex-end;
+    margin-top: 18px;
+  }
+  .total-bar.visible { display: flex; }
+  .total-box {
+    background: linear-gradient(135deg, var(--royal-blue) 0%, var(--royal-blue-light) 100%);
+    color: var(--cream);
+    padding: 14px 26px;
+    border-radius: 10px;
+    border: 2px solid var(--gold);
+    box-shadow: 0 3px 10px rgba(26,47,110,0.25);
+    text-align: right;
+  }
+  .total-box .label {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold-light);
+    font-weight: 600;
+  }
+  .total-box .amount {
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-top: 2px;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .table-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 16px;
+  }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 18, 40, 0.55);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+  }
+  .modal-overlay.visible { display: flex; }
+  .modal {
+    background: var(--cream);
+    border-radius: 14px;
+    border-top: 5px solid var(--gold);
+    max-width: 400px;
+    width: 100%;
+    padding: 24px 24px 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+    animation: pop 0.15s ease-out;
+  }
+  @keyframes pop {
+    from { transform: scale(0.94); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal h3 {
+    color: var(--royal-blue);
+    font-size: 1.08rem;
+    margin-bottom: 10px;
+  }
+  .modal p {
+    color: var(--text-dark);
+    font-size: 0.92rem;
+    margin-bottom: 20px;
+    line-height: 1.45;
+  }
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .btn-cancel {
+    background: #e6e0d0;
+    color: var(--text-dark);
+    padding: 9px 20px;
+    font-size: 0.9rem;
+  }
+  .btn-cancel:hover { background: #d8d1bd; }
+  .btn-confirm-danger {
+    background: var(--danger);
+    color: #fff;
+    padding: 9px 20px;
+    font-size: 0.9rem;
+  }
+  .btn-confirm-danger:hover { background: #9a1f19; }
+
+  /* ============ TOAST ============ */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--royal-blue-dark);
+    color: var(--cream);
+    padding: 12px 22px;
+    border-radius: 8px;
+    border-left: 4px solid var(--gold);
+    font-size: 0.9rem;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
+    z-index: 1100;
+    max-width: 90vw;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast.error { border-left-color: var(--danger); }
+
+  /* ============ FOOTER ============ */
+  footer {
+    background: var(--royal-blue-dark);
+    color: var(--cream-dark);
+    text-align: center;
+    padding: 16px;
+    font-size: 0.82rem;
+    border-top: 3px solid var(--gold);
+    letter-spacing: 0.4px;
+  }
+  footer .gold { color: var(--gold-light); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    header h1 { font-size: 1.45rem; }
+    header .subtitle { font-size: 0.95rem; }
+    .total-box .amount { font-size: 1.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header>
+  <h1>R&amp;J Tour and Services</h1>
+  <div class="subtitle">Payment Monitoring</div>
+  <div class="tagline">“Your Journey, Our Priority — Every Peso Accounted For.”</div>
+</header>
+
+<main>
+  <!-- ================= INPUT CONTAINER ================= -->
+  <section class="card">
+    <h2>New Booking Entry</h2>
+    <div class="input-grid">
+      <div class="field">
+        <label for="clientName">Client Name <span style="color:var(--danger)">*</span></label>
+        <input type="text" id="clientName" placeholder="Enter client name" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="pickupLocation">Pickup Location <span class="optional">(optional)</span></label>
+        <input type="text" id="pickupLocation" placeholder="Where you meet the client" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="packageRate">Package Rate (₱) <span style="color:var(--danger)">*</span></label>
+        <input type="number" id="packageRate" placeholder="0" min="0" step="0.01" inputmode="decimal" />
+      </div>
+      <div class="field">
+        <label for="downpayment">Downpayment (₱) <span style="color:var(--danger)">*</span></label>
+        <input type="number" id="downpayment" placeholder="0" min="0" step="0.01" inputmode="decimal" />
+      </div>
+    </div>
+    <div class="error-msg" id="downpaymentError"></div>
+    <div class="add-row">
+      <button type="button" class="btn-add" id="addButton" disabled>Add Booking</button>
+    </div>
+  </section>
+
+  <!-- ================= FIELD CONTAINER ================= -->
+  <section class="card">
+    <h2>Payment Records</h2>
+    <div class="table-wrap">
+      <table id="recordsTable">
+        <thead>
+          <tr>
+            <th>Client Name</th>
+            <th>Pickup Location</th>
+            <th class="currency">Package Rate</th>
+            <th class="currency">Downpayment</th>
+            <th class="currency">Balance Due</th>
+            <th class="currency">Payment Amount</th>
+            <th class="currency">Change Amount</th>
+            <th style="text-align:center">Settled</th>
+            <th style="text-align:center">Delete</th>
+          </tr>
+        </thead>
+        <tbody id="recordsBody">
+          <!-- rows injected here -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Total Balance Collected -->
+    <div class="total-bar" id="totalBar">
+      <div class="total-box">
+        <div class="label">Total Balance Collected</div>
+        <div class="amount" id="totalAmount">₱0</div>
+      </div>
+    </div>
+
+    <div class="table-actions">
+      <button type="button" class="btn-reset" id="resetButton">Reset All Data</button>
+    </div>
+  </section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <span class="gold">R&amp;J Tour and Services</span> &nbsp;•&nbsp; Payment Monitoring System
+  &nbsp;•&nbsp; All records saved locally on this device
+</footer>
+
+<!-- ================= DELETE CONFIRM MODAL ================= -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Delete this record?</h3>
+    <p>Are you sure you want to delete this field? This action cannot be undone.</p>
+    <div class="modal-buttons">
+      <button type="button" class="btn-cancel" id="deleteCancel">Cancel</button>
+      <button type="button" class="btn-confirm-danger" id="deleteConfirm">OK, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= RESET CONFIRM MODAL ================= -->
+<div class="modal-overlay" id="resetModal">
+  <div class="modal">
+    <h3>Reset all saved data?</h3>
+    <p>Are you sure you want to reset the saved data? All records will be permanently cleared from this device.</p>
+    <div class="modal-buttons">
+      <button type="button" class="btn-cancel" id="resetCancel">Cancel</button>
+      <button type="button" class="btn-confirm-danger" id="resetConfirm">OK, Reset</button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= TOAST ================= -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   R&J TOUR AND SERVICES — PAYMENT MONITORING
+   Architecture:
+   - state.rows = single source of truth (localStorage)
+   - derived values (balanceDue, changeAmount, totalCollected)
+     are NEVER stored — always recomputed
+   - save on: Add, Delete, Checkbox, Reset
+   - load on startup
+   ========================================================= */
+
+/* ---------- CONFIG ---------- */
+const STORAGE_KEY = "rj_payments_v1";
+
+/* ---------- STATE ---------- */
+let state = { rows: [] };
+
+/* ---------- DOM REFS ---------- */
+const clientNameInput   = document.getElementById("clientName");
+const pickupLocationInput = document.getElementById("pickupLocation");
+const packageRateInput  = document.getElementById("packageRate");
+const downpaymentInput  = document.getElementById("downpayment");
+const downpaymentError  = document.getElementById("downpaymentError");
+const addButton         = document.getElementById("addButton");
+const recordsBody       = document.getElementById("recordsBody");
+const totalBar          = document.getElementById("totalBar");
+const totalAmount       = document.getElementById("totalAmount");
+const resetButton       = document.getElementById("resetButton");
+const toastEl           = document.getElementById("toast");
+
+/* Delete modal */
+const deleteModal   = document.getElementById("deleteModal");
+const deleteCancel  = document.getElementById("deleteCancel");
+const deleteConfirm = document.getElementById("deleteConfirm");
+
+/* Reset modal */
+const resetModal   = document.getElementById("resetModal");
+const resetCancel  = document.getElementById("resetCancel");
+const resetConfirm = document.getElementById("resetConfirm");
+
+/* Pending action state */
+let pendingDeleteId = null;
+
+/* =========================================================
+   MONEY HELPERS
+   ========================================================= */
+
+/** Round to 2 decimals — eliminates float artifacts. */
+function round2(n) {
+  return Math.round((Number(n) + Number.EPSILON) * 100) / 100;
+}
+
+/**
+ * Format number as Philippine Peso.
+ * Shows cents ONLY when a non-zero cent value exists.
+ * Safe for 0, "", null, NaN.
+ */
+function formatPeso(amount) {
+  const num = Number(amount);
+  const safe = Number.isFinite(num) ? num : 0;
+  const rounded = round2(safe);
+  const hasCents = !Number.isInteger(rounded);
+
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    minimumFractionDigits: hasCents ? 2 : 0,
+    maximumFractionDigits: 2
+  }).format(rounded);
+}
+
+/* =========================================================
+   DERIVED VALUES (never stored)
+   ========================================================= */
+function balanceDue(row) {
+  return round2(row.packageRate - row.downpayment);
+}
+
+function changeAmount(row) {
+  return round2(row.paymentAmount - balanceDue(row));
+}
+
+function totalCollected(rows) {
+  const sum = rows
+    .filter(r => r.checked)
+    .reduce((acc, r) => acc + balanceDue(r), 0);
+  return round2(sum);
+}
+
+/* =========================================================
+   LOCAL STORAGE
+   ========================================================= */
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+  } catch (e) {
+    console.error("Save failed:", e);
+    showToast("Could not save data to this device.", true);
+  }
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    state.rows = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(state.rows)) state.rows = [];
+  } catch (e) {
+    console.error("Load failed, starting clean:", e);
+    state.rows = [];
+    localStorage.removeItem(STORAGE_KEY);
+  }
+}
+
+/* =========================================================
+   ADD BUTTON VALIDATION
+   Required: client name, package rate (> 0), downpayment (>=0, <= rate)
+   Optional: pickup location (NEVER blocks Add)
+   ========================================================= */
+function updateAddButtonState() {
+  const name = clientNameInput.value.trim();
+  const rate = parseFloat(packageRateInput.value);
+  const down = parseFloat(downpaymentInput.value);
+
+  const rateValid = Number.isFinite(rate) && rate > 0;
+  const downValid = Number.isFinite(down) && down >= 0;
+  const notExceed = downValid && rateValid && down <= rate;
+
+  const canAdd = name.length > 0 && rateValid && downValid && notExceed;
+  addButton.disabled = !canAdd;
+
+  /* Downpayment error message */
+  if (downValid && rateValid && down > rate) {
+    downpaymentError.textContent = "Downpayment cannot exceed package rate.";
+  } else {
+    downpaymentError.textContent = "";
+  }
+}
+
+/* =========================================================
+   RENDER
+   ========================================================= */
+function render() {
+  renderTable();
+  renderTotal();
+  updateAddButtonState();
+}
+
+function renderTable() {
+  recordsBody.innerHTML = "";
+
+  if (state.rows.length === 0) {
+    const tr = document.createElement("tr");
+    tr.className = "empty-row";
+    tr.innerHTML = `<td colspan="9">No bookings yet. Add your first booking above.</td>`;
+    recordsBody.appendChild(tr);
+    return;
+  }
+
+  state.rows.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.dataset.id = row.id;
+    if (row.checked) tr.classList.add("checked-row");
+
+    const bal = balanceDue(row);
+    const change = changeAmount(row);
+    const paymentValid = row.paymentAmount >= bal && bal >= 0;
+    const changeActive = paymentValid;
+
+    /* Build row */
+    tr.innerHTML = `
+      <td>${escapeHtml(row.clientName)}</td>
+      <td>${row.pickupLocation ? escapeHtml(row.pickupLocation) : "—"}</td>
+      <td class="currency">${formatPeso(row.packageRate)}</td>
+      <td class="currency">${formatPeso(row.downpayment)}</td>
+      <td class="currency">${formatPeso(bal)}</td>
+      <td class="currency">
+        <input type="number" class="payment-input"
+               data-id="${row.id}"
+               value="${row.paymentAmount || ""}"
+               min="0" step="0.01" inputmode="decimal"
+               placeholder="0" />
+      </td>
+      <td class="currency change-cell ${changeActive ? "" : "inactive"}">
+        ${changeActive ? formatPeso(change) : "—"}
+      </td>
+      <td style="text-align:center">
+        <input type="checkbox" class="settle-checkbox"
+               data-id="${row.id}"
+               ${row.checked ? "checked" : ""}
+               ${changeActive || row.checked ? "" : "disabled"} />
+      </td>
+      <td style="text-align:center">
+        <button type="button" class="btn-delete" data-id="${row.id}">Delete</button>
+      </td>
+    `;
+
+    recordsBody.appendChild(tr);
+  });
+
+  /* Bind payment inputs */
+  recordsBody.querySelectorAll(".payment-input").forEach(input => {
+    input.addEventListener("input", onPaymentInput);
+    input.addEventListener("blur", onPaymentBlur);
+  });
+
+  /* Bind checkboxes */
+  recordsBody.querySelectorAll(".settle-checkbox").forEach(cb => {
+    cb.addEventListener("change", onCheckboxChange);
+  });
+
+  /* Bind delete buttons */
+  recordsBody.querySelectorAll(".btn-delete").forEach(btn => {
+    btn.addEventListener("click", () => requestDelete(btn.dataset.id));
+  });
+}
+
+function renderTotal() {
+  if (state.rows.length === 0) {
+    totalBar.classList.remove("visible");
+    return;
+  }
+  totalBar.classList.add("visible");
+  totalAmount.textContent = formatPeso(totalCollected(state.rows));
+}
+
+/* =========================================================
+   ADD BOOKING
+   ========================================================= */
+addButton.addEventListener("click", () => {
+  if (addButton.disabled) return;
+
+  const rate = parseFloat(packageRateInput.value);
+  const down = parseFloat(downpaymentInput.value);
+
+  const newRow = {
+    id: generateId(),
+    clientName: clientNameInput.value.trim(),
+    pickupLocation: pickupLocationInput.value.trim(), // "" if blank — fine
+    packageRate: round2(rate),
+    downpayment: round2(down),
+    paymentAmount: 0,
+    checked: false
+  };
+
+  state.rows.push(newRow);
+  saveData();          // ✅ SAVE ON ADD
+  render();
+
+  /* Clear inputs and reset Add button */
+  clientNameInput.value = "";
+  pickupLocationInput.value = "";
+  packageRateInput.value = "";
+  downpaymentInput.value = "";
+  downpaymentError.textContent = "";
+  updateAddButtonState();
+
+  showToast("Booking added and saved.");
+  clientNameInput.focus();
+});
+
+/* Live validation on the four inputs */
+[clientNameInput, packageRateInput, downpaymentInput, pickupLocationInput].forEach(el => {
+  el.addEventListener("input", updateAddButtonState);
+});
+
+/* =========================================================
+   PAYMENT AMOUNT HANDLING (Phase 2 — live, not persisted until settled)
+   ========================================================= */
+function onPaymentInput(e) {
+  const input = e.target;
+  const id = input.dataset.id;
+  const row = state.rows.find(r => r.id === id);
+  if (!row) return;
+
+  const raw = input.value.trim();
+  const paid = raw === "" ? 0 : parseFloat(raw);
+  const valid = Number.isFinite(paid) && paid >= 0;
+
+  row.paymentAmount = valid ? round2(paid) : 0;
+
+  const bal = balanceDue(row);
+
+  if (!valid || row.paymentAmount < bal) {
+    /* Not enough balance */
+    row.checked = false;
+    if (raw !== "" && valid) {
+      showToast("Sorry, not enough balance.", true);
+    }
+  }
+
+  /* Re-render only this row's dependent cells (change + checkbox) for smooth typing */
+  const tr = recordsBody.querySelector(`tr[data-id="${id}"]`);
+  if (tr) {
+    const changeCell = tr.querySelector(".change-cell");
+    const cb = tr.querySelector(".settle-checkbox");
+    const enough = valid && row.paymentAmount >= bal;
+
+    if (enough) {
+      changeCell.classList.remove("inactive");
+      changeCell.textContent = formatPeso(changeAmount(row));
+      cb.disabled = false;
+    } else {
+      changeCell.classList.add("inactive");
+      changeCell.textContent = "—";
+      cb.disabled = true;
+      cb.checked = false;
+    }
+
+    if (row.checked) tr.classList.add("checked-row");
+    else tr.classList.remove("checked-row");
+  }
+
+  /* Update total if any checked row changed (defensive) */
+  renderTotal();
+}
+
+/* On blur, normalize display and persist if settled state changed */
+function onPaymentBlur(e) {
+  const input = e.target;
+  const id = input.dataset.id;
+  const row = state.rows.find(r => r.id === id);
+  if (!row) return;
+
+  if (!Number.isFinite(row.paymentAmount) || row.paymentAmount < 0) {
+    row.paymentAmount = 0;
+  }
+  input.value = row.paymentAmount > 0 ? row.paymentAmount : "";
+}
+
+/* =========================================================
+   CHECKBOX — "money received"
+   ========================================================= */
+function onCheckboxChange(e) {
+  const cb = e.target;
+  const id = cb.dataset.id;
+  const row = state.rows.find(r => r.id === id);
+  if (!row) return;
+
+  const bal = balanceDue(row);
+
+  /* Guard: cannot settle if payment is insufficient */
+  if (cb.checked && row.paymentAmount < bal) {
+    cb.checked = false;
+    showToast("Sorry, not enough balance.", true);
+    return;
+  }
+
+  row.checked = cb.checked;
+  saveData();          // ✅ SAVE ON CHECKBOX
+  render();
+  showToast(row.checked ? "Marked as settled — money received." : "Marked as unsettled.");
+}
+
+/* =========================================================
+   DELETE FLOW
+   ========================================================= */
+function requestDelete(id) {
+  pendingDeleteId = id;
+
+  /* Highlight the selected row */
+  recordsBody.querySelectorAll("tr").forEach(tr => tr.classList.remove("highlight"));
+  const tr = recordsBody.querySelector(`tr[data-id="${id}"]`);
+  if (tr) tr.classList.add("highlight");
+
+  deleteModal.classList.add("visible");
+}
+
+deleteCancel.addEventListener("click", () => {
+  deleteModal.classList.remove("visible");
+  pendingDeleteId = null;
+  recordsBody.querySelectorAll("tr").forEach(tr => tr.classList.remove("highlight"));
+});
+
+deleteConfirm.addEventListener("click", () => {
+  if (pendingDeleteId) {
+    state.rows = state.rows.filter(r => r.id !== pendingDeleteId);
+    saveData();          // ✅ SAVE ON DELETE
+    render();
+    showToast("Record deleted.");
+  }
+  pendingDeleteId = null;
+  deleteModal.classList.remove("visible");
+  recordsBody.querySelectorAll("tr").forEach(tr => tr.classList.remove("highlight"));
+});
+
+/* =========================================================
+   RESET FLOW
+   ========================================================= */
+resetButton.addEventListener("click", () => {
+  resetModal.classList.add("visible");
+});
+
+resetCancel.addEventListener("click", () => {
+  resetModal.classList.remove("visible");
+});
+
+resetConfirm.addEventListener("click", () => {
+  state.rows = [];
+  localStorage.removeItem(STORAGE_KEY);   // ✅ CLEAR SAVED DATA
+  resetModal.classList.remove("visible");
+  render();
+  showToast("All saved data has been reset.");
+});
+
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+function generateId() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  return "id-" + Date.now() + "-" + Math.random().toString(36).slice(2, 9);
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+let toastTimer = null;
+function showToast(message, isError = false) {
+  toastEl.textContent = message;
+  toastEl.classList.toggle("error", isError);
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2600);
+}
+
+/* =========================================================
+   STARTUP — LOAD + RENDER (this is what restores after accidental close)
+   ========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  loadData();
+  render();
+});
+</script>
+</body>
+</html>
